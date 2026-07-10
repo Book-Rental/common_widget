@@ -1,13 +1,17 @@
-import './App.css'
-import "./index.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import WidgetRouter from "./router/WidgetRouter";
+import "@rentbook/rentbook-ui-lib/microfrontend.min.css"
+interface AppProps {
+  flag?: string;
+}
 
-function App() {
+const queryClient = new QueryClient();
+
+function App({ flag = "category" }: AppProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-blue-600">
-        Common Widget
-      </h1>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <WidgetRouter flag={flag} />
+    </QueryClientProvider>
   );
 }
 
