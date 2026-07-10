@@ -1,9 +1,9 @@
+import { useEffect } from "react";
 import { useCategories } from "../hooks/useCategories";
 import CategoryCard from "../components/CategoryCard";
 import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
 import { slugify } from "../utils/slugify";
 import { Category } from "../types/category";
-
 
 const handleCategoryClick = (category: Category) => {
     window.history.pushState(
@@ -18,10 +18,16 @@ const handleCategoryClick = (category: Category) => {
 const CategoryPage = () => {
     const { data, isLoading, isError } = useCategories();
 
+    useEffect(() => {
+        const event = new CustomEvent("widget-loading-status", {
+            detail: isLoading,
+        });
+        window.dispatchEvent(event);
+    }, [isLoading]);
+
     if (isLoading) {
         return <Rb_LoadingSpinner text="Loading book details..." />;
     }
-
 
     if (isError) {
         return <Rb_Text variant="p">Something went wrong.</Rb_Text>;
