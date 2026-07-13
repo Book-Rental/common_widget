@@ -24,6 +24,7 @@ vi.mock("../components/CategoryCard", () => ({
 describe("CategoryPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        window.history.pushState({}, "", "/categories");
     });
 
     it("shows loading state", () => {
@@ -36,7 +37,7 @@ describe("CategoryPage", () => {
         render(<CategoryPage />);
 
         expect(
-            screen.getByText("Loading book details...")
+            screen.getByText("Loading categories...")
         ).toBeInTheDocument();
     });
 
@@ -54,7 +55,7 @@ describe("CategoryPage", () => {
         ).toBeInTheDocument();
     });
 
-    it("renders page heading", () => {
+    it("renders all categories heading", () => {
         vi.mocked(useCategories).mockReturnValue({
             data: {
                 data: [],
@@ -77,10 +78,12 @@ describe("CategoryPage", () => {
                     {
                         _id: "1",
                         name: "Romance",
+                        isPopular: true,
                     },
                     {
                         _id: "2",
                         name: "Fantasy",
+                        isPopular: true,
                     },
                 ],
             },
@@ -94,6 +97,40 @@ describe("CategoryPage", () => {
         expect(screen.getByText("Fantasy")).toBeInTheDocument();
     });
 
+    it("shows only popular categories when isPopular=true", () => {
+        window.history.pushState({}, "", "/categories?isPopular=true");
+
+        vi.mocked(useCategories).mockReturnValue({
+            data: {
+                data: [
+                    {
+                        _id: "1",
+                        name: "Romance",
+                        isPopular: true,
+                    },
+                    {
+                        _id: "2",
+                        name: "Business",
+                        isPopular: false,
+                    },
+                ],
+            },
+            isLoading: false,
+            isError: false,
+        } as never);
+
+        render(<CategoryPage />);
+
+        expect(
+            screen.getByText("Popular Categories")
+        ).toBeInTheDocument();
+
+        expect(screen.getByText("Romance")).toBeInTheDocument();
+        expect(
+            screen.queryByText("Business")
+        ).not.toBeInTheDocument();
+    });
+
     it("navigates when category is clicked", () => {
         vi.mocked(useCategories).mockReturnValue({
             data: {
@@ -101,6 +138,7 @@ describe("CategoryPage", () => {
                     {
                         _id: "1",
                         name: "Romance",
+                        isPopular: true,
                     },
                 ],
             },
