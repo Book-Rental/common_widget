@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCategories } from "../hooks/useCategories";
 import CategoryCard from "../components/CategoryCard";
 import { Rb_LoadingSpinner, Rb_Text } from "@rentbook/rentbook-ui-lib";
@@ -17,6 +17,7 @@ const handleCategoryClick = (category: Category) => {
 
 const CategoryPage = () => {
     const { data, isLoading, isError } = useCategories();
+    const [popularOnly, setPopularOnly] = useState(false);
 
     useEffect(() => {
         const event = new CustomEvent("widget-loading-status", {
@@ -25,13 +26,25 @@ const CategoryPage = () => {
         window.dispatchEvent(event);
     }, [isLoading]);
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get("isPopular") === "true") {
+            setPopularOnly(true);
+        }
+    }, []);
+
     if (isLoading) {
-        return <Rb_LoadingSpinner text="Loading book details..." />;
+        return <Rb_LoadingSpinner text="Loading categories..." />;
     }
 
     if (isError) {
         return <Rb_Text variant="p">Something went wrong.</Rb_Text>;
     }
+
+    const categories = popularOnly
+        ? data?.data.filter((category) => category.isPopular)
+        : data?.data;
 
     return (
         <section className="w-full">
@@ -40,11 +53,11 @@ const CategoryPage = () => {
                     variant="h2"
                     className="mb-5 font-bold text-[#1B1530]"
                 >
-                    All Categories
+                    {popularOnly ? "Popular Categories" : "All Categories"}
                 </Rb_Text>
 
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                    {data?.data.map((category) => (
+                    {categories?.map((category) => (
                         <CategoryCard
                             key={category._id}
                             category={category}
