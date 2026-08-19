@@ -14,8 +14,18 @@ describe("slugify", () => {
     expect(slugify("Book Rental App")).toBe("book-rental-app");
   });
 
-  it("replaces '&' with a hyphen", () => {
+  it("replaces '&' with 'and'", () => {
     expect(slugify("Science & Technology")).toBe(
+      "science-and-technology"
+    );
+  });
+
+  it("removes apostrophes", () => {
+    expect(slugify("Harry's Book")).toBe("harrys-book");
+  });
+
+  it("replaces special characters with hyphens", () => {
+    expect(slugify("Science @ Technology!")).toBe(
       "science-technology"
     );
   });
@@ -28,6 +38,12 @@ describe("slugify", () => {
 
   it("handles lowercase text without changes", () => {
     expect(slugify("storybook")).toBe("storybook");
+  });
+
+  it("removes leading and trailing hyphens", () => {
+    expect(slugify("---Harry Potter---")).toBe(
+      "harry-potter"
+    );
   });
 
   it("returns an empty string for empty input", () => {
